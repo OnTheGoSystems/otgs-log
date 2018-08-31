@@ -8,27 +8,6 @@ namespace OTGS\Tests;
 class Test_Add_Log_Entries extends TestCase {
 	private $options = array();
 
-	public function setUp() {
-		parent::setUp();
-
-		\WP_Mock::userFunction( 'get_option', array(
-			'return' => function ( $option_name, $default ) {
-				if ( array_key_exists( $option_name, $this->options ) ) {
-					return $this->options[ $option_name ];
-				}
-
-				return $default;
-			},
-		) );
-		\WP_Mock::userFunction( 'update_option', array(
-			'return' => function ( $option_name, $value ) {
-				$this->options[ $option_name ] = $value;
-			},
-
-		) );
-
-	}
-
 	/**
 	 * @test
 	 * @throws \OTGS_MissingAdaptersException
@@ -107,4 +86,27 @@ class Test_Add_Log_Entries extends TestCase {
 		$log->addMessage( 'Another message' );
 		$this->assertCount( $max_entries, $entries );
 	}
+
+
+	public function setUp() {
+		parent::setUp();
+
+		\WP_Mock::userFunction( 'get_option', array(
+			'return' => function ( $option_name, $default ) {
+				if ( array_key_exists( $option_name, $this->options ) ) {
+					return $this->options[ $option_name ];
+				}
+
+				return $default;
+			},
+		) );
+		\WP_Mock::userFunction( 'update_option', array(
+			'return' => function ( $option_name, $value ) {
+				$this->options[ $option_name ] = $value;
+			},
+
+		) );
+
+	}
+
 }
