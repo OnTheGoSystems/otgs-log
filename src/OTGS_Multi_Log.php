@@ -3,7 +3,7 @@
 /**
  * @author OnTheGo Systems
  */
-class OTGS_Log {
+class OTGS_Multi_Log implements OTGS_Log {
 	/** @var \OTGS_Log_Adapter[] */
 	private $adapters;
 	/** @var \OTGS_Log_Adapter */
@@ -52,7 +52,7 @@ class OTGS_Log {
 	/**
 	 * @param null|string $adapter
 	 *
-	 * @return \OTGS_Log
+	 * @return \OTGS_Multi_Log
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function withAdapter( $adapter ) {

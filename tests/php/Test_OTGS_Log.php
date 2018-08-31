@@ -14,7 +14,7 @@ class Test_OTGS_Log extends TestCase {
 		$adapter_name = 'some-adapter';
 		$entry        = 'An entry';
 
-		$subject = new \OTGS_Log();
+		$subject = new \OTGS_Multi_Log();
 
 		$this->expectException( \OTGS_MissingAdaptersException::class );
 
@@ -34,7 +34,7 @@ class Test_OTGS_Log extends TestCase {
 
 		$this->expectException( \OTGS_MissingAdaptersException::class );
 
-		$subject = new \OTGS_Log();
+		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
 		$subject->withAdapter( $another_adapter_name )->add( $entry );
 	}
@@ -60,7 +60,7 @@ class Test_OTGS_Log extends TestCase {
 						 ->method( 'get' )
 						 ->willReturn( $timestamp );
 
-		$subject = new \OTGS_Log();
+		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
 
@@ -90,7 +90,7 @@ class Test_OTGS_Log extends TestCase {
 						 ->method( 'get' )
 						 ->willReturn( $timestamp );
 
-		$subject = new \OTGS_Log();
+		$subject = new \OTGS_Multi_Log();
 		$subject->setEntryFormat( $entry_format );
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
@@ -116,7 +116,7 @@ class Test_OTGS_Log extends TestCase {
 		$another_log_adapter->expects( $this->never() )
 							->method( 'add' );
 
-		$subject = new \OTGS_Log();
+		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
 		$subject->addAdapter( $another_log_adapter );
 

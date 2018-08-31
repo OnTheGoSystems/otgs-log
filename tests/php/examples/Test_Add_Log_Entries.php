@@ -15,7 +15,7 @@ class Test_Add_Log_Entries extends TestCase {
 	public function it_adds_log_entries_in_wp_options_SIMPLE() {
 		$adapter = new \OTGS_WP_Option_Log( 'otgs-log' );
 
-		$log = new \OTGS_Log( array( $adapter ) );
+		$log = new \OTGS_Multi_Log( array( $adapter ) );
 
 		$log->addMessage( 'First message' );
 		$log->addMessage( 'Second message' );
@@ -41,7 +41,7 @@ class Test_Add_Log_Entries extends TestCase {
 		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
 		$adapter   = new \OTGS_WP_Option_Log( 'otgs-log' );
 
-		$log = new \OTGS_Log();
+		$log = new \OTGS_Multi_Log();
 
 		$log->addAdapter( $adapter );
 		$log->setTimestamp( $timestamp );
@@ -73,7 +73,7 @@ class Test_Add_Log_Entries extends TestCase {
 		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
 		$adapter   = new \OTGS_WP_Option_Log( 'otgs-log', $max_entries );
 
-		$log = new \OTGS_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );
+		$log = new \OTGS_Multi_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );
 
 		for ( $i = 0; $i < $max_entries*2; $i++ ) {
 			$log->addMessage( 'Message ' . $i );
