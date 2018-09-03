@@ -12,21 +12,23 @@ class OTGS_Multi_Log implements OTGS_Log {
 	private $timestamp;
 	/** @var string */
 	private $format;
+	/** @var callable */
+	private $data_encoding;
 
 	/**
 	 * OTGS_Log constructor.
 	 *
 	 * @param \OTGS_Log_Adapter[] $adapters
 	 * @param \OTGS_Log_TimeStamp $timestamp
-	 * @param string              $format
+	 * @param string              $entry_template
 	 */
-	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $format = '%timestamp% %type% %entry%' ) {
+	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $entry_template = '%timestamp% %type% %entry% %extra_data%' ) {
 		foreach ( $adapters as $adapter ) {
 			$this->addAdapter( $adapter );
 		}
 
 		$this->timestamp = $timestamp;
-		$this->format    = $format;
+		$this->format    = $entry_template;
 	}
 
 	/**
@@ -36,6 +38,14 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 */
 	public function setEntryFormat( $format ) {
 		$this->format = $format;
+	}
+
+	/**
+	 * @param callable $callback Specifies the function to encode non-scalar data.
+	 *                           Defaults to `json_encode`.
+	 */
+	public function setDataEncoding( $callback ) {
+		$this->data_encoding = $callback;
 	}
 
 	/**
@@ -62,28 +72,34 @@ class OTGS_Multi_Log implements OTGS_Log {
 	}
 
 	/**
-	 * @param string $entry
-	 * @param string $type
+	 * @param string     $entry
+	 * @param string     $type
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function add( $entry, $type = 'info' ) {
+	public function add( $entry, $type = 'I', $extra_data = null ) {
 		if ( ! $this->current_adapter ) {
 			$this->getAdapter();
 		}
 
-		$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $this->getTimestamp(), $type, $entry ), $this->format );
+		$encoded_extra_data = '';
+		if ( null !== $extra_data ) {
+			$encoded_extra_data = $extra_data;
+			if ( ! is_scalar( $extra_data ) ) {
+				$encoded_extra_data = call_user_func( $this->getDataEncoding(), $extra_data );
+			}
+		}
 
-		$this->current_adapter->add( $formatted_entry );
-	}
+		$timestamp = $this->getTimestamp();
 
-	/**
-	 * @param $entry
-	 *
-	 * @throws \OTGS_MissingAdaptersException
-	 */
-	public function addMessage( $entry ) {
-		$this->add( $entry, 'Message' );
+		$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%', '%extra_data%' ), array( $timestamp, $type, $entry, $encoded_extra_data ), $this->format );
+		$this->current_adapter->add( trim( $formatted_entry ) );
+
+		if ( $encoded_extra_data && strpos( $this->format, '%extra_data%' ) === false ) {
+			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->format );
+			$this->current_adapter->add( trim( $formatted_entry ) );
+		}
 	}
 
 	/**
@@ -92,7 +108,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function addError( $entry ) {
-		$this->add( $entry, 'Error' );
+		$this->add( $entry, 'E' );
 	}
 
 	/**
@@ -101,7 +117,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function addWarning( $entry ) {
-		$this->add( $entry, 'Warning' );
+		$this->add( $entry, 'W' );
 	}
 
 	/**
@@ -153,5 +169,11 @@ class OTGS_Multi_Log implements OTGS_Log {
 		}
 
 		return $timestamp;
+	}
+
+	protected function getDataEncoding() {
+		if ( ! $this->data_encoding ) {
+			return 'json_encode';
+		}
 	}
 }

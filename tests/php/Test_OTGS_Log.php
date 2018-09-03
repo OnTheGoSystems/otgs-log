@@ -72,13 +72,14 @@ class Test_OTGS_Log extends TestCase {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function it_sets_the_format_of_the_entry_log() {
-		$entry_format = '%timestamp%: %entry%';
+		$entry_format = '%timestamp%: %entry% %extra_data%';
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$new_entry = 'Last entry';
+		$new_entry  = 'Last entry';
+		$extra_data = 'Extra data';
 
-		$expected_entry = str_replace( array( '%timestamp%', '%entry%' ), array( $timestamp, $new_entry ), $entry_format );
+		$expected_entry = str_replace( array( '%timestamp%', '%entry%', '%extra_data%' ), array( $timestamp, $new_entry, $extra_data ), $entry_format );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name );
 		$some_log_adapter->expects( $this->once() )
@@ -95,7 +96,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, 'Info', $extra_data );
 	}
 
 	/**

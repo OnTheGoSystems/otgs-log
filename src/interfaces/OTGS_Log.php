@@ -7,20 +7,17 @@
  * @author OnTheGo Systems
  */
 interface OTGS_Log {
+	const ENTRY_WARNING = 'W';
+	const ENTRY_ERROR   = 'E';
+	const ENTRY_INFO    = 'I';
+
 	/**
 	 * @param string $entry
 	 * @param string $type
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function add( $entry, $type = 'info' );
-
-	/**
-	 * @param $entry
-	 *
-	 * @throws \OTGS_MissingAdaptersException
-	 */
-	public function addMessage( $entry );
+	public function add( $entry, $type = 'I' );
 
 	/**
 	 * @param $entry

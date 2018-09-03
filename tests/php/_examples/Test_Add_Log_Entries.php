@@ -17,14 +17,14 @@ class Test_Add_Log_Entries extends TestCase {
 
 		$log = new \OTGS_Multi_Log( array( $adapter ) );
 
-		$log->addMessage( 'First message' );
-		$log->addMessage( 'Second message' );
+		$log->add( 'First message' );
+		$log->add( 'Second message' );
 		$log->addError( 'First error' );
 		$log->addError( 'Second error' );
 		$log->addWarning( 'First warning' );
 		$log->addWarning( 'Second warning' );
-		$log->add( 'generic', 'Info' );
-		$log->add( 'generic', 'Info' );
+		$log->add( 'generic', 'Test' );
+		$log->add( 'generic', 'Test' );
 
 		$entries = $log->get();
 
@@ -47,14 +47,14 @@ class Test_Add_Log_Entries extends TestCase {
 		$log->setTimestamp( $timestamp );
 		$log->setEntryFormat( '%timestamp% %entry%' );
 
-		$log->addMessage( 'First message' );
-		$log->addMessage( 'Second message' );
+		$log->add( 'First message' );
+		$log->add( 'Second message' );
 		$log->addError( 'First error' );
 		$log->addError( 'Second error' );
 		$log->addWarning( 'First warning' );
 		$log->addWarning( 'Second warning' );
-		$log->add( 'generic', 'Info' );
-		$log->add( 'generic', 'Info' );
+		$log->add( 'generic', 'Test' );
+		$log->add( 'generic', 'Test' );
 
 		$entries = $log->get();
 
@@ -76,14 +76,14 @@ class Test_Add_Log_Entries extends TestCase {
 		$log = new \OTGS_Multi_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );
 
 		for ( $i = 0; $i < $max_entries*2; $i++ ) {
-			$log->addMessage( 'Message ' . $i );
+			$log->add( 'Message ' . $i );
 		}
 
 		$entries = $log->get();
 
 		$this->assertCount( $max_entries, $entries );
 
-		$log->addMessage( 'Another message' );
+		$log->add( 'Another message' );
 		$this->assertCount( $max_entries, $entries );
 	}
 
