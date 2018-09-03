@@ -175,5 +175,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 		if ( ! $this->data_encoding ) {
 			return 'json_encode';
 		}
+
+		return $this->data_encoding;
 	}
 }
