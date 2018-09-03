@@ -6,6 +6,7 @@
 namespace OTGS\Tests;
 
 class Test_File_System_Log extends TestCase {
+
 	/**
 	 * @test
 	 */
@@ -23,7 +24,11 @@ class Test_File_System_Log extends TestCase {
 
 		$subject->add( $new_entry );
 
-		$file_entries = explode( PHP_EOL, file_get_contents( $filename ) );
+		$contents = file_get_contents( $filename );
+		$contents = preg_replace( '/^[\r\n]+/', '', $contents );
+		$contents = preg_replace( '/[\r\n]+$/', '', $contents );
+
+		$file_entries = explode( PHP_EOL, $contents );
 
 		$this->assertSame( $file_entries, $subject->getEntries() );
 

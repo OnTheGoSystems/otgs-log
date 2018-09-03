@@ -33,7 +33,10 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 			$entries = array_slice( $entries, -$this->max_entries, $this->max_entries );
 		}
 
-		return file_put_contents( $this->filename, implode( PHP_EOL, $entries ) );
+		$contents = implode( PHP_EOL, $entries );
+		$contents .= PHP_EOL;
+
+		return file_put_contents( $this->filename, $contents );
 	}
 
 	/**
@@ -45,7 +48,10 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 			$contents = file_get_contents( $this->filename );
 		}
 
-		return explode( PHP_EOL, $contents );
+		$contents = preg_replace( '/^[\r\n]+/', '', $contents );
+		$contents = preg_replace( '/[\r\n]+$/', '', $contents );
+
+		return $contents ? explode( PHP_EOL, $contents ) : array();
 	}
 
 }
