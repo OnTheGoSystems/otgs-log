@@ -4,12 +4,33 @@
  * @author OnTheGo Systems
  */
 class OTGS_JSON_File_Log extends OTGS_File_System_Log {
+
+	public function hasTemplate() {
+		return false;
+	}
+
 	/**
 	 * @param string $entry
 	 *
-	 * @return bool
+	 * @throws \OTGS_ExpectedArrayEntryException
 	 */
-	public function add( $entry ) {
+	public function addFormatted( $entry ) {
+		$this->throwExpectedArrayEntryException();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getEntries() {
+		return json_decode( $this->getContents(), true );
+	}
+
+	/**
+	 * @param array $entry
+	 *
+	 * @return bool|int
+	 */
+	public function add( array $entry ) {
 		$entries = $this->getEntries();
 
 		$entries[] = $entry;
@@ -26,12 +47,4 @@ class OTGS_JSON_File_Log extends OTGS_File_System_Log {
 
 		return $this->saveContents( $json );
 	}
-
-	/**
-	 * @return array
-	 */
-	public function getEntries() {
-		return json_decode( $this->getContents(), true );
-	}
-
 }

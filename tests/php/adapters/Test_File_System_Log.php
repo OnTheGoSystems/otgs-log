@@ -9,6 +9,20 @@ class Test_File_System_Log extends TestCase {
 
 	/**
 	 * @test
+	 * @throws \OTGS_ExpectedFormattedEntryException
+	 */
+	public function it_throws_an_exception_when_trying_to_add_a_formatted_entry() {
+		$filename = 'tests.log';
+
+		$subject = new \OTGS_File_System_Log( $filename );
+
+		$this->expectException( '\OTGS_ExpectedFormattedEntryException' );
+
+		$subject->add( array( 'Some string' ) );
+	}
+
+	/**
+	 * @test
 	 */
 	public function it_stores_the_entry_in_a_file() {
 		$filename        = 'tests.log';
@@ -22,7 +36,7 @@ class Test_File_System_Log extends TestCase {
 
 		$subject = new \OTGS_File_System_Log( $filename );
 
-		$subject->add( $new_entry );
+		$subject->addFormatted( $new_entry );
 
 		$contents = file_get_contents( $filename );
 		$contents = preg_replace( '/^[\r\n]+/', '', $contents );
@@ -56,4 +70,27 @@ class Test_File_System_Log extends TestCase {
 		unlink( $filename );
 	}
 
+	/**
+	 * @test
+	 */
+	public function it_limits_the_entries() {
+		$limit    = 100;
+		$filename = 'tests.log';
+
+		$subject = new \OTGS_File_System_Log( $filename, $limit );
+
+		$entry = null;
+		for ( $i = 0; $i < $limit*2; $i++ ) {
+			$entry     = 'Entry ' . $i;
+			$subject->addFormatted( $entry );
+		}
+		$last_entry = $entry;
+
+		$file_entries = $subject->getEntries();
+
+		$this->assertCount( $limit, $file_entries );
+		$this->assertSame( $last_entry, end( $file_entries ) );
+
+		unlink( $filename );
+	}
 }

@@ -45,7 +45,7 @@ class Test_Add_Log_Entries extends TestCase {
 
 		$log->addAdapter( $adapter );
 		$log->setTimestamp( $timestamp );
-		$log->setEntryFormat( '%timestamp% %entry%' );
+		$log->setEntryTemplate( '%timestamp% %entry%' );
 
 		$log->add( 'First message' );
 		$log->add( 'Second message' );

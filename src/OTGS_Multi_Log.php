@@ -11,7 +11,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	/** @var \OTGS_Log_TimeStamp */
 	private $timestamp;
 	/** @var string */
-	private $format;
+	private $entryTemplate;
 	/** @var callable */
 	private $data_encoding;
 
@@ -27,17 +27,17 @@ class OTGS_Multi_Log implements OTGS_Log {
 			$this->addAdapter( $adapter );
 		}
 
-		$this->timestamp = $timestamp;
-		$this->format    = $entry_template;
+		$this->timestamp     = $timestamp;
+		$this->entryTemplate = $entry_template;
 	}
 
 	/**
-	 * @param string $format Specifies the format which must be used to build the entry.
+	 * @param string $template Specifies the format which must be used to build the entry.
 	 *                       Placeholders: `%timestamp%`, `%type%`, `%entry%`.
 	 *                       Defaults to `%timestamp% %type% %entry%`.
 	 */
-	public function setEntryFormat( $format ) {
-		$this->format = $format;
+	public function setEntryTemplate( $template ) {
+		$this->entryTemplate = $template;
 	}
 
 	/**
@@ -93,12 +93,21 @@ class OTGS_Multi_Log implements OTGS_Log {
 
 		$timestamp = $this->getTimestamp();
 
-		$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%', '%extra_data%' ), array( $timestamp, $type, $entry, $encoded_extra_data ), $this->format );
-		$this->current_adapter->add( trim( $formatted_entry ) );
+		if ( $this->current_adapter->hasTemplate() ) {
+			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%', '%extra_data%' ), array( $timestamp, $type, $entry, $encoded_extra_data ), $this->entryTemplate );
+			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
+		} else {
+			$this->current_adapter->add( array(
+				'timestamp'  => $timestamp,
+				'type'       => $type,
+				'entry'      => $entry,
+				'extra_data' => $encoded_extra_data,
+			) );
+		}
 
-		if ( $encoded_extra_data && strpos( $this->format, '%extra_data%' ) === false ) {
-			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->format );
-			$this->current_adapter->add( trim( $formatted_entry ) );
+		if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra_data%' ) === false ) {
+			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->entryTemplate );
+			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 		}
 	}
 

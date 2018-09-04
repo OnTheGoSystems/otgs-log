@@ -9,14 +9,28 @@ class Test_JSON_File_Log extends TestCase {
 
 	/**
 	 * @test
+	 * @throws \OTGS_ExpectedArrayEntryException
+	 */
+	public function it_throws_an_exception_when_trying_to_add_a_formatted_entry() {
+		$filename        = 'tests.log';
+
+		$subject = new \OTGS_JSON_File_Log( $filename );
+
+		$this->expectException( '\OTGS_ExpectedArrayEntryException' );
+
+		$subject->addFormatted( 'Some string' );
+	}
+
+	/**
+	 * @test
 	 */
 	public function it_stores_the_entry_in_a_file() {
 		$filename        = 'tests.log';
 		$entries         = array(
-			'First-entry',
-			'Second-entry',
+			array( 'First-entry' ),
+			array( 'Second-entry' ),
 		);
-		$new_entry       = 'New-entry';
+		$new_entry       = array( 'New-entry' );
 		$updated_entries = $entries;
 		array_push( $updated_entries, $new_entry );
 
@@ -39,8 +53,8 @@ class Test_JSON_File_Log extends TestCase {
 	public function it_gets_the_entries_from_a_file() {
 		$filename = 'tests.log';
 		$entries  = array(
-			'First-entry',
-			'Second-entry',
+			array( 'First-entry' ),
+			array( 'Second-entry' ),
 		);
 
 		$file_content = json_encode( $entries );
@@ -56,4 +70,27 @@ class Test_JSON_File_Log extends TestCase {
 		unlink( $filename );
 	}
 
+	/**
+	 * @test
+	 */
+	public function it_limits_the_entries() {
+		$limit    = 100;
+		$filename = 'tests.log';
+
+		$subject = new \OTGS_JSON_File_Log( $filename, $limit );
+
+		$entry = null;
+		for ( $i = 0; $i < $limit*2; $i++ ) {
+			$entry     = array( 'Entry ' . $i );
+			$subject->add( $entry );
+		}
+		$last_entry = $entry;
+
+		$file_entries = $subject->getEntries();
+
+		$this->assertCount( $limit, $file_entries );
+		$this->assertSame( $last_entry, end( $file_entries ) );
+
+		unlink( $filename );
+	}
 }

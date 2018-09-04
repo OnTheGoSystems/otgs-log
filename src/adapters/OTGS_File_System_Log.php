@@ -19,12 +19,16 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 		$this->max_entries = $max_entries;
 	}
 
+	public function hasTemplate() {
+		return true;
+	}
+
 	/**
 	 * @param string $entry
 	 *
 	 * @return bool
 	 */
-	public function add( $entry ) {
+	public function addFormatted( $entry ) {
 		$entries = $this->getEntries();
 
 		$entries[] = $entry;
@@ -72,4 +76,12 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 		return file_put_contents( $this->filename, $contents );
 	}
 
+	/**
+	 * @param array $entry
+	 *
+	 * @throws \OTGS_ExpectedFormattedEntryException
+	 */
+	public function add( array $entry ) {
+		$this->throwExpectedFormattedEntryException();
+	}
 }

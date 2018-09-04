@@ -19,12 +19,16 @@ class OTGS_WP_Option_Log extends OTGS_Log_Adapter {
 		$this->max_entries = $max_entries;
 	}
 
+	public function hasTemplate() {
+		return true;
+	}
+
 	/**
 	 * @param string $entry
 	 *
 	 * @return bool
 	 */
-	public function add( $entry ) {
+	public function addFormatted( $entry ) {
 		$entries = $this->getEntries();
 
 		$entries[] = $entry;
@@ -43,4 +47,12 @@ class OTGS_WP_Option_Log extends OTGS_Log_Adapter {
 		return get_option( $this->option_key, array() );
 	}
 
+	/**
+	 * @param array $entry
+	 *
+	 * @throws \OTGS_ExpectedFormattedEntryException
+	 */
+	public function add( array $entry ) {
+		$this->throwExpectedFormattedEntryException();
+	}
 }
