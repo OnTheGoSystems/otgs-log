@@ -6,7 +6,7 @@
 namespace OTGS\Tests;
 
 	class Test_Add_Log_Entries_In_File_System extends TestCase {
-	const LOG_FILE = 'examples-otgs-log.txt';
+	const LOG_FILE = 'examples.otgs.log.txt';
 
 	protected function getLogFileName() {
 		return self::LOG_FILE;

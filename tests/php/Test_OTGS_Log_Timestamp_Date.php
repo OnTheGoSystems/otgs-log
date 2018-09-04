@@ -15,7 +15,31 @@ class Test_OTGS_Log_Timestamp_Date extends TestCase {
 		$subject = new \OTGS_Log_Timestamp_Date();
 		$subject->setFormat( $format );
 
-		$this->assertSame( date( $format ), $subject->get() );
+		$this->assertSame( date( $format ), $subject->getFormatted() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_gets_a_timestamp() {
+		$format = 'Y-m-d';
+
+		$subject = new \OTGS_Log_Timestamp_Date();
+		$subject->setFormat( $format );
+
+		$this->assertInternalType( 'float', $subject->get() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_gets_the_timezone() {
+		$format = 'Y-m-d';
+
+		$subject = new \OTGS_Log_Timestamp_Date();
+		$subject->setFormat( $format );
+
+		$this->assertInstanceOf( 'DateTimeZone', $subject->getTimeZone() );
 	}
 
 	protected function getLogFileName() {

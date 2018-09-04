@@ -6,7 +6,7 @@
 namespace OTGS\Tests;
 
 class Test_Add_Log_Entries_In_JSON_File extends TestCase {
-	const LOG_FILE = 'examples-otgs-log.json';
+	const LOG_FILE = 'examples.otgs.log.json';
 
 	protected function getLogFileName() {
 		return self::LOG_FILE;
@@ -42,9 +42,8 @@ class Test_Add_Log_Entries_In_JSON_File extends TestCase {
 	 */
 	public function it_adds_log_entries_ADVANCED() {
 		$max_entries      = 8;
-		$timestamp_format = 'Y-m-d H:i:s.u';
 
-		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
+		$timestamp = new \OTGS_Log_Timestamp_Date(  );
 		$adapter   = new \OTGS_JSON_File_Log( self::getTestFile() );
 
 		$log = new \OTGS_Multi_Log();
@@ -74,9 +73,7 @@ class Test_Add_Log_Entries_In_JSON_File extends TestCase {
 	public function it_keeps_the_log_in_the_max_entries_limit() {
 		$max_entries = 100;
 
-		$timestamp_format = 'Y-m-d H:i:s.u';
-
-		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
+		$timestamp = new \OTGS_Log_Timestamp_Date(  );
 		$adapter   = new \OTGS_JSON_File_Log( self::getTestFile(), $max_entries );
 
 		$log = new \OTGS_Multi_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );

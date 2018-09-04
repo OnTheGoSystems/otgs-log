@@ -4,6 +4,7 @@
  * @author OnTheGo Systems
  */
 class OTGS_File_System_Log extends OTGS_Log_Adapter {
+	CONST EXTENSION = 'otgs.log.txt';
 
 	protected $filename;
 	protected $max_entries;
@@ -16,6 +17,7 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 	 */
 	public function __construct( $filename, $max_entries = 0 ) {
 		$this->filename    = $filename;
+		$this->adjustExtension();
 		$this->max_entries = $max_entries;
 	}
 
@@ -83,5 +85,14 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 	 */
 	public function add( array $entry ) {
 		$this->throwExpectedFormattedEntryException();
+	}
+
+	private function adjustExtension() {
+		$extension = static::EXTENSION;
+		if ( strpos( $this->filename, $extension ) !== ( strlen( $this->filename ) - strlen( $extension ) ) ) {
+			$this->filename .= '.' . $extension;
+		}
+
+
 	}
 }

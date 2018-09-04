@@ -6,7 +6,7 @@
 namespace OTGS\Tests;
 
 class Test_JSON_File_Log extends TestCase {
-	const LOG_FILE = 'test-otgs-log.json';
+	const LOG_FILE = 'test.otgs.log.json';
 
 	protected function getLogFileName() {
 		return self::LOG_FILE;
@@ -78,7 +78,7 @@ class Test_JSON_File_Log extends TestCase {
 		$entry = null;
 		for ( $i = 0; $i < $limit*2; $i++ ) {
 			$entry = array(
-				'timestamp' => date( 'Y-m-d H:i:s.u' ),
+				'timestamp' => $this->get_microtime(),
 				'message'   => 'Entry ' . $i,
 			);
 			$subject->add( $entry );
@@ -88,7 +88,7 @@ class Test_JSON_File_Log extends TestCase {
 		$file_entries = $subject->getEntries();
 
 		$this->assertCount( $limit, $file_entries );
-		$this->assertSame( $last_entry, end( $file_entries ) );
+		$this->assertEquals( $last_entry, end( $file_entries ), '', .1 );
 	}
 
 	/**
@@ -119,5 +119,11 @@ class Test_JSON_File_Log extends TestCase {
 		$file_entries = json_decode( $contents, true );
 
 		$this->assertSame( $file_entries, $subject->getEntries() );
+	}
+
+	private function get_microtime() {
+		list( $usec, $sec ) = explode( ' ', microtime() );
+
+		return ( (float) $usec + (float) $sec );
 	}
 }

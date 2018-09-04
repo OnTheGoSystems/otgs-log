@@ -70,8 +70,6 @@ class OTGS_Multi_Log implements OTGS_Log {
 		}
 		$data['description'] = $this->entry_types->getDescription( $level );
 
-		$timestamp = $this->getTimestampValue();
-
 		if ( $this->current_adapter->hasTemplate() ) {
 
 			$encoded_extra_data = '';
@@ -82,6 +80,8 @@ class OTGS_Multi_Log implements OTGS_Log {
 				}
 			}
 
+			$timestamp = $this->getTimestampFormatted();
+
 			$formatted_entry = str_replace( array( '%timestamp%', '%level%', '%entry%', '%extra%' ), array( $timestamp, $level, $entry, $encoded_extra_data ), $this->entryTemplate );
 			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 
@@ -91,14 +91,16 @@ class OTGS_Multi_Log implements OTGS_Log {
 			}
 
 		} else {
+			$timestamp_value = $this->getTimestampValue();
+
 			$entry1 = array(
-				'timestamp'  => $timestamp,
+				'timestamp'  => $timestamp_value,
 				'level'      => $level,
 				'level_name' => $level_name,
 				'message'    => $entry,
 				'extra'      => $data,
 				'datetime'   => array(
-					'date'     => $timestamp,
+					'date'     => $timestamp_value,
 					'timezone' => $this->getTimeStamp()->getTimeZoneValue(),
 				)
 			);
@@ -207,6 +209,13 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 */
 	protected function getTimestampValue() {
 		return $this->getTimeStamp()->get();
+	}
+
+	/**
+	 * @return false|string
+	 */
+	protected function getTimestampFormatted() {
+		return $this->getTimeStamp()->getFormatted();
 	}
 
 	protected function getDataEncoding() {

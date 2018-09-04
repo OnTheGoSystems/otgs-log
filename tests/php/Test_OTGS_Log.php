@@ -18,7 +18,7 @@ class Test_OTGS_Log extends TestCase {
 
 		$this->expectException( \OTGS_MissingAdaptersException::class );
 
-		$subject->withAdapter( $adapter_name )->add( $entry );
+		$subject->withAdapter( $adapter_name )->add( $entry, \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
 	}
 
 	/**
@@ -36,7 +36,7 @@ class Test_OTGS_Log extends TestCase {
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
-		$subject->withAdapter( $another_adapter_name )->add( $entry );
+		$subject->withAdapter( $another_adapter_name )->add( $entry, \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
 	}
 
 	/**
@@ -73,8 +73,10 @@ class Test_OTGS_Log extends TestCase {
 
 		$timestamp_helper = $this->get_timestamp_helper( 'SomeTimeStampHelper' );
 		$timestamp_helper->expects( $this->once() )
-						 ->method( 'get' )
+						 ->method( 'getFormatted' )
 						 ->willReturn( $timestamp );
+		$timestamp_helper->expects( $this->never() )
+						 ->method( 'get' );
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
@@ -93,7 +95,7 @@ class Test_OTGS_Log extends TestCase {
 
 		$level      = 0;
 		$new_entry  = 'Last entry';
-		$extra_data          = array(
+		$extra_data = array(
 			'A' => 1,
 			'B' => 2,
 			'C' => 3,
@@ -107,8 +109,10 @@ class Test_OTGS_Log extends TestCase {
 
 		$timestamp_helper = $this->get_timestamp_helper( 'SomeTimeStampHelper' );
 		$timestamp_helper->expects( $this->once() )
-						 ->method( 'get' )
+						 ->method( 'getFormatted' )
 						 ->willReturn( $timestamp );
+		$timestamp_helper->expects( $this->never() )
+						 ->method( 'get' );
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
@@ -126,8 +130,8 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$level              = 0;
-		$new_entry          = 'Last entry';
+		$level               = 0;
+		$new_entry           = 'Last entry';
 		$extra_data          = array(
 			'A' => 1,
 			'B' => 2,
@@ -141,7 +145,7 @@ class Test_OTGS_Log extends TestCase {
 			),
 			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
 		);
-		$encoded_extra_data = serialize( $expected_extra_data );
+		$encoded_extra_data  = serialize( $expected_extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
@@ -152,8 +156,10 @@ class Test_OTGS_Log extends TestCase {
 
 		$timestamp_helper = $this->get_timestamp_helper( 'SomeTimeStampHelper' );
 		$timestamp_helper->expects( $this->once() )
-						 ->method( 'get' )
+						 ->method( 'getFormatted' )
 						 ->willReturn( $timestamp );
+		$timestamp_helper->expects( $this->never() )
+						 ->method( 'get' );
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
@@ -168,11 +174,11 @@ class Test_OTGS_Log extends TestCase {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function it_stores_the_array_entry_in_the_log_adapter() {
-		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
+		$timestamp    = 1234.5678;
 		$adapter_name = 'SomeLogAdapter';
 
-		$level      = 0;
-		$new_entry  = 'Last entry';
+		$level               = 0;
+		$new_entry           = 'Last entry';
 		$extra_data          = array(
 			'A' => 1,
 			'B' => 2,
@@ -205,6 +211,8 @@ class Test_OTGS_Log extends TestCase {
 						 ->method( 'addFormatted' );
 
 		$timestamp_helper = $this->get_timestamp_helper( 'SomeTimeStampHelper' );
+		$timestamp_helper->expects( $this->never() )
+						 ->method( 'getFormatted' );
 		$timestamp_helper->expects( $this->once() )
 						 ->method( 'get' )
 						 ->willReturn( $timestamp );
@@ -251,8 +259,10 @@ class Test_OTGS_Log extends TestCase {
 
 		$timestamp_helper = $this->get_timestamp_helper( 'SomeTimeStampHelper' );
 		$timestamp_helper->expects( $this->once() )
-						 ->method( 'get' )
+						 ->method( 'getFormatted' )
 						 ->willReturn( $timestamp );
+		$timestamp_helper->expects( $this->never() )
+						 ->method( 'get' );
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->setEntryTemplate( $entry_format );
@@ -295,15 +305,15 @@ class Test_OTGS_Log extends TestCase {
 	 */
 	public function get_adapter_stub( $class_name, $hasTemplate = null ) {
 		$adapter = $this->getMockBuilder( \OTGS_Log_Adapter::class )
-									->setMockClassName( $class_name )
-									->disableOriginalConstructor()
-									->setMethods( array(
-										'hasTemplate',
-										'addFormatted',
-										'add',
-										'getEntries',
-									) )
-									->getMock();
+						->setMockClassName( $class_name )
+						->disableOriginalConstructor()
+						->setMethods( array(
+							'hasTemplate',
+							'addFormatted',
+							'add',
+							'getEntries',
+						) )
+						->getMock();
 
 		if ( null !== $hasTemplate ) {
 			$adapter->method( 'hasTemplate' )->willReturn( $hasTemplate );
@@ -322,10 +332,11 @@ class Test_OTGS_Log extends TestCase {
 						  ->setMockClassName( $class_name )
 						  ->disableOriginalConstructor()
 						  ->setMethods( array(
-										'setFormat',
-										'get',
+							  'setFormat',
+							  'getFormatted',
+							  'get',
 							  'getTimeZoneValue',
-									) )
+						  ) )
 						  ->getMock();
 
 		return $timestamp;

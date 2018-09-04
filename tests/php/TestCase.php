@@ -11,15 +11,16 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function tearDown() {
-		if ( file_exists( $this->getTestFile() ) ) {
-			unlink( self::getTestFile() );
+		$test_file = $this->getTestFile();
+		if ( file_exists( $test_file ) ) {
+			unlink( $test_file );
 		}
 		\WP_Mock::tearDown();
 		parent::tearDown();
 	}
 
 	protected function getTestFile() {
-		return __DIR__ . '/' . __CLASS__ . '.' . $this->getLogFileName();
+		return __DIR__ . '/' . str_replace( '\\', '_', get_called_class() ) . '.' . $this->getLogFileName();
 	}
 
 	abstract protected function getLogFileName();

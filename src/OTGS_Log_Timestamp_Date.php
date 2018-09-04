@@ -23,9 +23,17 @@ class OTGS_Log_Timestamp_Date implements OTGS_Log_TimeStamp {
 	}
 
 	/**
-	 * @return string
+	 * @return float
 	 */
 	public function get() {
+		list($usec, $sec) = explode(' ',microtime());
+		return ((float)$usec + (float)$sec);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getFormatted() {
 		return $this->getDateInstance()->format( $this->format );
 	}
 
@@ -47,8 +55,6 @@ class OTGS_Log_Timestamp_Date implements OTGS_Log_TimeStamp {
 	 * @return \DateTime
 	 */
 	private function getDateInstance() {
-		$date = new DateTime();
-
-		return $date;
+		return DateTime::createFromFormat( '0.u00 U', microtime() );
 	}
 }

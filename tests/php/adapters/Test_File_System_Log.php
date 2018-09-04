@@ -6,7 +6,7 @@
 namespace OTGS\Tests;
 
 class Test_File_System_Log extends TestCase {
-	const LOG_FILE = 'test-otgs-log.json';
+	const LOG_FILE = 'test.otgs.log.txt';
 
 	protected function getLogFileName() {
 		return self::LOG_FILE;

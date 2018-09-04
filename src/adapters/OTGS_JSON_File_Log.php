@@ -4,6 +4,8 @@
  * @author OnTheGo Systems
  */
 class OTGS_JSON_File_Log extends OTGS_File_System_Log {
+	CONST EXTENSION = 'otgs.log.json';
+
 	public function __construct( $filename, $max_entries = 0 ) {
 		parent::__construct( $filename, $max_entries );
 		$this->fix_missing_constants();

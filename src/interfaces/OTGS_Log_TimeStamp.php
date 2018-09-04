@@ -10,9 +10,14 @@ interface OTGS_Log_TimeStamp {
 	public function setFormat( $format );
 
 	/**
-	 * @return string
+	 * @return float
 	 */
 	public function get();
+
+	/**
+	 * @return string
+	 */
+	public function getFormatted();
 
 	/**
 	 * @return string
