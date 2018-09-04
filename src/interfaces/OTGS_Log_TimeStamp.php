@@ -13,4 +13,9 @@ interface OTGS_Log_TimeStamp {
 	 * @return string
 	 */
 	public function get();
+
+	/**
+	 * @return string
+	 */
+	public function getTimeZoneValue();
 }

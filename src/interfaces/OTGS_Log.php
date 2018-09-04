@@ -7,34 +7,30 @@
  * @author OnTheGo Systems
  */
 interface OTGS_Log {
-	const ENTRY_WARNING = 'W';
-	const ENTRY_ERROR   = 'E';
-	const ENTRY_INFO    = 'I';
-
 	/**
 	 * @param string     $entry
-	 * @param string     $type
-	 * @param mixed|null $extra_data
+	 * @param int        $level
+	 * @param array|null $extra_data
 	 *
-	 * @throws \OTGS_MissingAdaptersException
+	 * @return
 	 */
-	public function add( $entry, $type = 'I', $extra_data = null );
+	public function add( $entry, $level = 0, array $extra_data = null );
 
 	/**
 	 * @param $entry
-	 * @param mixed|null $extra_data
+	 * @param array|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addError( $entry, $extra_data = null );
+	public function addError( $entry, array $extra_data = null );
 
 	/**
 	 * @param $entry
-	 * @param mixed|null $extra_data
+	 * @param array|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addWarning( $entry, $extra_data = null );
+	public function addWarning( $entry, array $extra_data = null );
 
 	/**
 	 * Get all entries

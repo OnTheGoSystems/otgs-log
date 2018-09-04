@@ -26,6 +26,29 @@ class OTGS_Log_Timestamp_Date implements OTGS_Log_TimeStamp {
 	 * @return string
 	 */
 	public function get() {
-		return date( $this->format );
+		return $this->getDateInstance()->format( $this->format );
+	}
+
+	/**
+	 * @return \DateTimeZone
+	 */
+	public function getTimeZone() {
+		return $this->getDateInstance()->getTimezone();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTimeZoneValue() {
+		return $this->getTimezone()->getName();
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	private function getDateInstance() {
+		$date = new DateTime();
+
+		return $date;
 	}
 }

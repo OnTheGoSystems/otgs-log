@@ -47,15 +47,21 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$entry_type         = 'Info';
+		$level              = 0;
 		$new_entry          = 'Last entry';
-		$extra_data         = array( 'A' => 1, 'B' => 2, 'C' => 3 );
+		$extra_data         = array(
+			'A'           => 1,
+			'B'           => 2,
+			'C'           => 3,
+			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
+			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		);
 		$encoded_extra_data = json_encode( $extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
 						 ->method( 'addFormatted' )
-						 ->with( $timestamp . ' ' . $entry_type . ' ' . $new_entry . ' ' . $encoded_extra_data );
+						 ->with( $timestamp . ' ' . $level . ' ' . $new_entry . ' ' . $encoded_extra_data );
 		$some_log_adapter->expects( $this->never() )
 						 ->method( 'add' );
 
@@ -68,7 +74,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry, $entry_type, $extra_data );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, $level, $extra_data );
 	}
 
 	/**
@@ -79,9 +85,15 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$entry_type = 'Info';
+		$level      = 0;
 		$new_entry  = 'Last entry';
-		$extra_data = array( 'A' => 1, 'B' => 2, 'C' => 3 );
+		$extra_data = array(
+			'A'           => 1,
+			'B'           => 2,
+			'C'           => 3,
+			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
+			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		);
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->exactly( 2 ) )
@@ -99,7 +111,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->setTimestamp( $timestamp_helper );
 		$subject->setEntryTemplate( '%timestamp% %type% %entry%' );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry, $entry_type, $extra_data );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, $level, $extra_data );
 	}
 
 	/**
@@ -110,15 +122,21 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$entry_type         = 'Info';
+		$level              = 0;
 		$new_entry          = 'Last entry';
-		$extra_data         = array( 'A' => 1, 'B' => 2, 'C' => 3 );
+		$extra_data         = array(
+			'A'           => 1,
+			'B'           => 2,
+			'C'           => 3,
+			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
+			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		);
 		$encoded_extra_data = serialize( $extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
 						 ->method( 'addFormatted' )
-						 ->with( $timestamp . ' ' . $entry_type . ' ' . $new_entry . ' ' . $encoded_extra_data );
+						 ->with( $timestamp . ' ' . $level . ' ' . $new_entry . ' ' . $encoded_extra_data );
 		$some_log_adapter->expects( $this->never() )
 						 ->method( 'add' );
 
@@ -132,7 +150,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->setTimestamp( $timestamp_helper );
 		$subject->setDataEncoding( 'serialize' );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry, $entry_type, $extra_data );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, $level, $extra_data );
 	}
 
 	/**
@@ -143,18 +161,28 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$entry_type         = 'Info';
-		$new_entry          = 'Last entry';
-		$extra_data         = array( 'A' => 1, 'B' => 2, 'C' => 3 );
+		$level      = 0;
+		$new_entry  = 'Last entry';
+		$extra_data = array(
+			'A'           => 1,
+			'B'           => 2,
+			'C'           => 3,
+			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		);
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, false );
 		$some_log_adapter->expects( $this->once() )
 						 ->method( 'add' )
 						 ->with( array(
 							 'timestamp'  => $timestamp,
-							 'type'       => $entry_type,
+							 'level'      => 0,
+							 'level_name' => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
 							 'message'    => $new_entry,
-							 'extra_data' => $extra_data,
+							 'extra'      => $extra_data,
+							 'datetime'   => array(
+								 'date'     => $timestamp,
+								 'timezone' => 'Time/Zone',
+							 )
 						 ) );
 		$some_log_adapter->expects( $this->never() )
 						 ->method( 'addFormatted' );
@@ -163,12 +191,15 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp_helper->expects( $this->once() )
 						 ->method( 'get' )
 						 ->willReturn( $timestamp );
+		$timestamp_helper->expects( $this->once() )
+						 ->method( 'getTimeZoneValue' )
+						 ->willReturn( 'Time/Zone' );
 
 		$subject = new \OTGS_Multi_Log();
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry, $entry_type, $extra_data );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, $level, $extra_data );
 	}
 
 	/**
@@ -176,14 +207,25 @@ class Test_OTGS_Log extends TestCase {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function it_sets_the_format_of_the_entry_log() {
-		$entry_format = '%timestamp%: %entry% %extra_data%';
+		$entry_format = '%timestamp%: %level% %entry% %extra_data%';
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
+		$level      = 0;
 		$new_entry  = 'Last entry';
-		$extra_data = 'Extra data';
+		$extra_data = array( 'Extra data' );
 
-		$expected_entry = str_replace( array( '%timestamp%', '%entry%', '%extra_data%' ), array( $timestamp, $new_entry, $extra_data ), $entry_format );
+		$expected_extra_data         = array(
+			'Extra data',
+			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		);
+		$expected_extra_data_encoded = json_encode( $expected_extra_data );
+
+		$expected_entry = str_replace(
+			array( '%timestamp%', '%level%', '%entry%', '%extra_data%' ),
+			array( $timestamp, $level, $new_entry, $expected_extra_data_encoded ),
+			$entry_format
+		);
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
@@ -200,7 +242,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->addAdapter( $some_log_adapter );
 		$subject->setTimestamp( $timestamp_helper );
 
-		$subject->withAdapter( $adapter_name )->add( $new_entry, 'Info', $extra_data );
+		$subject->withAdapter( $adapter_name )->add( $new_entry, $level, $extra_data );
 	}
 
 	/**
@@ -265,6 +307,7 @@ class Test_OTGS_Log extends TestCase {
 						  ->setMethods( array(
 										'setFormat',
 										'get',
+							  'getTimeZoneValue',
 									) )
 						  ->getMock();
 

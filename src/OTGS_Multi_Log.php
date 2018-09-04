@@ -14,15 +14,23 @@ class OTGS_Multi_Log implements OTGS_Log {
 	private $entryTemplate;
 	/** @var callable */
 	private $data_encoding;
+	/** @var \OTGS_Log_Entry_Levels */
+	private $entry_types;
 
 	/**
 	 * OTGS_Log constructor.
 	 *
-	 * @param \OTGS_Log_Adapter[] $adapters
-	 * @param \OTGS_Log_TimeStamp $timestamp
-	 * @param string              $entry_template
+	 * @param \OTGS_Log_Adapter[]         $adapters
+	 * @param \OTGS_Log_TimeStamp         $timestamp
+	 * @param string                      $entry_template
+	 * @param \OTGS_Log_Entry_Levels|null $entry_types
 	 */
-	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $entry_template = '%timestamp% %type% %entry% %extra_data%' ) {
+	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $entry_template = '%timestamp% %level% %entry% %extra_data%', OTGS_Log_Entry_Levels $entry_types = null ) {
+		if ( ! $entry_types ) {
+			$entry_types = new OTGS_Log_Entry_Levels_Default();
+		}
+		$this->entry_types = $entry_types;
+
 		foreach ( $adapters as $adapter ) {
 			$this->addAdapter( $adapter );
 		}
@@ -33,8 +41,8 @@ class OTGS_Multi_Log implements OTGS_Log {
 
 	/**
 	 * @param string $template Specifies the format which must be used to build the entry.
-	 *                       Placeholders: `%timestamp%`, `%type%`, `%entry%`.
-	 *                       Defaults to `%timestamp% %type% %entry%`.
+	 *                         Placeholders: `%timestamp%`, `%level%`, `%entry%`, `%extra_data%`.
+	 *                         Defaults to `%timestamp% %level% %entry% %extra_data%`.
 	 */
 	public function setEntryTemplate( $template ) {
 		$this->entryTemplate = $template;
@@ -73,17 +81,20 @@ class OTGS_Multi_Log implements OTGS_Log {
 
 	/**
 	 * @param string     $entry
-	 * @param string     $type
-	 * @param mixed|null $extra_data
+	 * @param int        $level
+	 * @param array|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function add( $entry, $type = 'I', $extra_data = null ) {
+	public function add( $entry, $level = OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL, array $extra_data = array() ) {
 		if ( ! $this->current_adapter ) {
 			$this->getAdapter();
 		}
+		$level_name = $this->entry_types->getName( $level );
 
-		$timestamp = $this->getTimestamp();
+		$extra_data['description'] = $this->entry_types->getDescription( $level );
+
+		$timestamp = $this->getTimestampValue();
 
 		if ( $this->current_adapter->hasTemplate() ) {
 
@@ -95,41 +106,48 @@ class OTGS_Multi_Log implements OTGS_Log {
 				}
 			}
 
-			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%', '%extra_data%' ), array( $timestamp, $type, $entry, $encoded_extra_data ), $this->entryTemplate );
+			$formatted_entry = str_replace( array( '%timestamp%', '%level%', '%entry%', '%extra_data%' ), array( $timestamp, $level, $entry, $encoded_extra_data ), $this->entryTemplate );
 			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 
 			if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra_data%' ) === false ) {
-				$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->entryTemplate );
+				$formatted_entry = str_replace( array( '%timestamp%', '%entry%' ), array( $timestamp, $encoded_extra_data ), $this->entryTemplate );
 				$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 			}
+
 		} else {
-			$this->current_adapter->add( array(
+			$entry1 = array(
 				'timestamp'  => $timestamp,
-				'type'       => $type,
+				'level'      => $level,
+				'level_name' => $level_name,
 				'message'    => $entry,
-				'extra_data' => $extra_data,
-			) );
+				'extra'      => $extra_data,
+				'datetime'   => array(
+					'date'     => $timestamp,
+					'timezone' => $this->getTimeStamp()->getTimeZoneValue(),
+				)
+			);
+			$this->current_adapter->add( $entry1 );
 		}
 	}
 
 	/**
 	 * @param $entry
-	 * @param mixed|null $extra_data
+	 * @param array|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addError( $entry, $extra_data = null ) {
-		$this->add( $entry, 'E', $extra_data );
+	public function addError( $entry, array $extra_data = array() ) {
+		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_ERROR );
 	}
 
 	/**
 	 * @param $entry
-	 * @param mixed|null $extra_data
+	 * @param array|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addWarning( $entry, $extra_data = null ) {
-		$this->add( $entry, 'W', $extra_data );
+	public function addWarning( $entry, array $extra_data = array() ) {
+		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_WARNING );
 	}
 
 	/**
@@ -173,14 +191,8 @@ class OTGS_Multi_Log implements OTGS_Log {
 	/**
 	 * @return false|string
 	 */
-	protected function getTimestamp() {
-		if ( $this->timestamp ) {
-			$timestamp = $this->timestamp->get();
-		} else {
-			$timestamp = date( 'Y-m-d H:i:s.u' );
-		}
-
-		return $timestamp;
+	protected function getTimestampValue() {
+		return $this->getTimeStamp()->get();;
 	}
 
 	protected function getDataEncoding() {
@@ -189,5 +201,16 @@ class OTGS_Multi_Log implements OTGS_Log {
 		}
 
 		return $this->data_encoding;
+	}
+
+	/**
+	 * @return \OTGS_Log_TimeStamp
+	 */
+	protected function getTimeStamp() {
+		if ( ! $this->timestamp ) {
+			$this->timestamp = new OTGS_Log_Timestamp_Date( 'Y-m-d H:i:s.u' );
+		}
+
+		return $this->timestamp;
 	}
 }

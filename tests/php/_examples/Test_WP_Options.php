@@ -45,7 +45,7 @@ class Test_Add_Log_Entries_In_WP_Options extends TestCase {
 
 		$log->addAdapter( $adapter );
 		$log->setTimestamp( $timestamp );
-		$log->setEntryTemplate( '%timestamp% %entry%' );
+		$log->setEntryTemplate( '%timestamp% %entry% %extra_data%' );
 
 		$log->add( 'First message' );
 		$log->add( 'Second message' );
