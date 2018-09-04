@@ -49,6 +49,8 @@ class OTGS_JSON_File_Log extends OTGS_File_System_Log {
 			$json = json_encode( $entries, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK | JSON_ERROR_RECURSION | JSON_PARTIAL_OUTPUT_ON_ERROR );
 		}
 
+		$json = str_replace( '},{"timestamp"', '},' . PHP_EOL . '{"timestamp"', $json );
+
 		return $this->saveContents( $json );
 	}
 
