@@ -5,22 +5,25 @@
 
 namespace OTGS\Tests;
 
-class Test_Add_Log_Entries extends TestCase {
+class Test_Add_Log_Entries_In_JSON_File extends TestCase {
+	const LOG_FILE = 'otgs-log.json';
+
 	private $options = array();
 
 	/**
 	 * @test
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function it_adds_log_entries_in_wp_options_SIMPLE() {
-		$adapter = new \OTGS_WP_Option_Log( 'otgs-log' );
+	public function it_adds_log_entries_SIMPLE() {
+		$max_entries = 8;
+		$adapter     = new \OTGS_JSON_File_Log( self::LOG_FILE );
 
 		$log = new \OTGS_Multi_Log( array( $adapter ) );
 
 		$log->add( 'First message' );
 		$log->add( 'Second message' );
-		$log->addError( 'First error' );
-		$log->addError( 'Second error' );
+		$log->addError( 'First error', array( 'Extra data' => array( 'A' => 1, 'B' => 2, 'C' => 3 ) ) );
+		$log->addError( 'Second error', array( 'Extra data' => array( 'A' => 1, 'B' => 2, 'C' => 3 ) ) );
 		$log->addWarning( 'First warning' );
 		$log->addWarning( 'Second warning' );
 		$log->add( 'generic', 'Test' );
@@ -28,18 +31,19 @@ class Test_Add_Log_Entries extends TestCase {
 
 		$entries = $log->get();
 
-		$this->assertCount( 8, $entries );
+		$this->assertCount( $max_entries, $entries );
 	}
 
 	/**
 	 * @test
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function it_adds_log_entries_in_wp_options_ADVANCED() {
+	public function it_adds_log_entries_ADVANCED() {
+		$max_entries      = 8;
 		$timestamp_format = 'Y-m-d H:i:s.u';
 
 		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
-		$adapter   = new \OTGS_WP_Option_Log( 'otgs-log' );
+		$adapter   = new \OTGS_JSON_File_Log( self::LOG_FILE );
 
 		$log = new \OTGS_Multi_Log();
 
@@ -58,7 +62,7 @@ class Test_Add_Log_Entries extends TestCase {
 
 		$entries = $log->get();
 
-		$this->assertCount( 8, $entries );
+		$this->assertCount( $max_entries, $entries );
 	}
 
 	/**
@@ -71,7 +75,7 @@ class Test_Add_Log_Entries extends TestCase {
 		$timestamp_format = 'Y-m-d H:i:s.u';
 
 		$timestamp = new \OTGS_Log_Timestamp_Date( $timestamp_format );
-		$adapter   = new \OTGS_WP_Option_Log( 'otgs-log', $max_entries );
+		$adapter   = new \OTGS_JSON_File_Log( self::LOG_FILE, $max_entries );
 
 		$log = new \OTGS_Multi_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );
 
@@ -87,26 +91,8 @@ class Test_Add_Log_Entries extends TestCase {
 		$this->assertCount( $max_entries, $entries );
 	}
 
-
-	public function setUp() {
-		parent::setUp();
-
-		\WP_Mock::userFunction( 'get_option', array(
-			'return' => function ( $option_name, $default ) {
-				if ( array_key_exists( $option_name, $this->options ) ) {
-					return $this->options[ $option_name ];
-				}
-
-				return $default;
-			},
-		) );
-		\WP_Mock::userFunction( 'update_option', array(
-			'return' => function ( $option_name, $value ) {
-				$this->options[ $option_name ] = $value;
-			},
-
-		) );
-
+	public function tearDown() {
+		unlink( self::LOG_FILE );
+		parent::tearDown();
 	}
-
 }

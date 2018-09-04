@@ -100,7 +100,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 			$this->current_adapter->add( array(
 				'timestamp'  => $timestamp,
 				'type'       => $type,
-				'entry'      => $entry,
+				'message'    => $entry,
 				'extra_data' => $encoded_extra_data,
 			) );
 		}
@@ -113,20 +113,22 @@ class OTGS_Multi_Log implements OTGS_Log {
 
 	/**
 	 * @param $entry
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addError( $entry ) {
-		$this->add( $entry, 'E' );
+	public function addError( $entry, $extra_data = null ) {
+		$this->add( $entry, 'E', $extra_data );
 	}
 
 	/**
 	 * @param $entry
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addWarning( $entry ) {
-		$this->add( $entry, 'W' );
+	public function addWarning( $entry, $extra_data = null ) {
+		$this->add( $entry, 'W', $extra_data );
 	}
 
 	/**

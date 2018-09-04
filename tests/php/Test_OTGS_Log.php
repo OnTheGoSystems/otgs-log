@@ -154,7 +154,7 @@ class Test_OTGS_Log extends TestCase {
 						 ->with( array(
 							 'timestamp'  => $timestamp,
 							 'type'       => $entry_type,
-							 'entry'      => $new_entry,
+							 'message'    => $new_entry,
 							 'extra_data' => $encoded_extra_data,
 						 ) );
 		$some_log_adapter->expects( $this->never() )

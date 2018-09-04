@@ -81,7 +81,10 @@ class Test_JSON_File_Log extends TestCase {
 
 		$entry = null;
 		for ( $i = 0; $i < $limit*2; $i++ ) {
-			$entry     = array( 'Entry ' . $i );
+			$entry = array(
+				'timestamp' => date( 'Y-m-d H:i:s.u' ),
+				'message'   => 'Entry ' . $i,
+			);
 			$subject->add( $entry );
 		}
 		$last_entry = $entry;

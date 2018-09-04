@@ -25,7 +25,7 @@ class Test_WP_Options_Log extends TestCase {
 	/**
 	 * @test
 	 */
-	public function it_stores_the_entry_in_wp_options() {
+	public function it_stores_the_entry() {
 		$option_key      = 'option_key';
 		$entries         = array(
 			'First-entry',
@@ -52,7 +52,7 @@ class Test_WP_Options_Log extends TestCase {
 	/**
 	 * @test
 	 */
-	public function it_gets_the_entries_from_wp_options() {
+	public function it_gets_the_entries() {
 		$option_key = 'option_key';
 		$entries    = array(
 			'First-entry',

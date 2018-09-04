@@ -12,26 +12,29 @@ interface OTGS_Log {
 	const ENTRY_INFO    = 'I';
 
 	/**
-	 * @param string $entry
-	 * @param string $type
+	 * @param string     $entry
+	 * @param string     $type
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function add( $entry, $type = 'I' );
+	public function add( $entry, $type = 'I', $extra_data = null );
 
 	/**
 	 * @param $entry
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addError( $entry );
+	public function addError( $entry, $extra_data = null );
 
 	/**
 	 * @param $entry
+	 * @param mixed|null $extra_data
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function addWarning( $entry );
+	public function addWarning( $entry, $extra_data = null );
 
 	/**
 	 * Get all entries
