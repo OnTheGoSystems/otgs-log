@@ -17,14 +17,14 @@ class Test_Add_Log_Entries_In_WP_Options extends TestCase {
 
 		$log = new \OTGS_Multi_Log( array( $adapter ) );
 
-		$log->add( 'First message' );
-		$log->add( 'Second message' );
+		$log->add( 'First message', \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
+		$log->add( 'Second message', \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
 		$log->addError( 'First error' );
 		$log->addError( 'Second error' );
 		$log->addWarning( 'First warning' );
 		$log->addWarning( 'Second warning' );
-		$log->add( 'generic', 'Test' );
-		$log->add( 'generic', 'Test' );
+		$log->addInfo( 'First info' );
+		$log->addInfo( 'Second info' );
 
 		$entries = $log->get();
 
@@ -47,14 +47,14 @@ class Test_Add_Log_Entries_In_WP_Options extends TestCase {
 		$log->setTimestamp( $timestamp );
 		$log->setEntryTemplate( '%timestamp% %entry% %extra_data%' );
 
-		$log->add( 'First message' );
-		$log->add( 'Second message' );
+		$log->add( 'First message', \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
+		$log->add( 'Second message', \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
 		$log->addError( 'First error' );
 		$log->addError( 'Second error' );
 		$log->addWarning( 'First warning' );
 		$log->addWarning( 'Second warning' );
-		$log->add( 'generic', 'Test' );
-		$log->add( 'generic', 'Test' );
+		$log->addInfo( 'First info' );
+		$log->addInfo( 'Second info' );
 
 		$entries = $log->get();
 
@@ -76,14 +76,14 @@ class Test_Add_Log_Entries_In_WP_Options extends TestCase {
 		$log = new \OTGS_Multi_Log( array( $adapter ), $timestamp, '%timestamp% %entry%' );
 
 		for ( $i = 0; $i < $max_entries*2; $i++ ) {
-			$log->add( 'Message ' . $i );
+			$log->add( 'Message ' . $i, \OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL );
 		}
 
 		$entries = $log->get();
 
 		$this->assertCount( $max_entries, $entries );
 
-		$log->add( 'Another message' );
+		$log->addWarning( 'Another message' );
 		$this->assertCount( $max_entries, $entries );
 	}
 

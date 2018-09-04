@@ -14,23 +14,7 @@ interface OTGS_Log {
 	 *
 	 * @return
 	 */
-	public function add( $entry, $level = 0, array $extra_data = null );
-
-	/**
-	 * @param $entry
-	 * @param array|null $extra_data
-	 *
-	 * @throws \OTGS_MissingAdaptersException
-	 */
-	public function addError( $entry, array $extra_data = null );
-
-	/**
-	 * @param $entry
-	 * @param array|null $extra_data
-	 *
-	 * @throws \OTGS_MissingAdaptersException
-	 */
-	public function addWarning( $entry, array $extra_data = null );
+	public function add( $entry, $level, array $extra_data = null );
 
 	/**
 	 * Get all entries

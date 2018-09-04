@@ -40,34 +40,6 @@ class OTGS_Multi_Log implements OTGS_Log {
 	}
 
 	/**
-	 * @param string $template Specifies the format which must be used to build the entry.
-	 *                         Placeholders: `%timestamp%`, `%level%`, `%entry%`, `%extra_data%`.
-	 *                         Defaults to `%timestamp% %level% %entry% %extra_data%`.
-	 */
-	public function setEntryTemplate( $template ) {
-		$this->entryTemplate = $template;
-	}
-
-	/**
-	 * @param callable $callback Specifies the function to encode non-scalar data.
-	 *                           Defaults to `json_encode`.
-	 */
-	public function setDataEncoding( $callback ) {
-		$this->data_encoding = $callback;
-	}
-
-	/**
-	 * @param \OTGS_Log_Adapter $adapter
-	 */
-	public function addAdapter( OTGS_Log_Adapter $adapter ) {
-		$this->adapters[ get_class( $adapter ) ] = $adapter;
-	}
-
-	public function setTimestamp( OTGS_Log_TimeStamp $timestamp ) {
-		$this->timestamp = $timestamp;
-	}
-
-	/**
 	 * @param null|string $adapter
 	 *
 	 * @return \OTGS_Multi_Log
@@ -86,7 +58,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 *
 	 * @throws \OTGS_MissingAdaptersException
 	 */
-	public function add( $entry, $level = OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL, array $extra_data = array() ) {
+	public function add( $entry, $level, array $extra_data = array() ) {
 		if ( ! $this->current_adapter ) {
 			$this->getAdapter();
 		}
@@ -137,7 +109,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function addError( $entry, array $extra_data = array() ) {
-		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_ERROR );
+		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_ERROR, $extra_data );
 	}
 
 	/**
@@ -147,7 +119,17 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function addWarning( $entry, array $extra_data = array() ) {
-		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_WARNING );
+		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_WARNING, $extra_data );
+	}
+
+	/**
+	 * @param            $entry
+	 * @param array|null $extra_data
+	 *
+	 * @throws \OTGS_MissingAdaptersException
+	 */
+	public function addInfo( $entry, array $extra_data = array() ) {
+		$this->add( $entry, OTGS_Log_Entry_Levels::LEVEL_INFORMATIONAL, $extra_data );
 	}
 
 	/**
@@ -189,10 +171,38 @@ class OTGS_Multi_Log implements OTGS_Log {
 	}
 
 	/**
+	 * @param string $template Specifies the format which must be used to build the entry.
+	 *                         Placeholders: `%timestamp%`, `%level%`, `%entry%`, `%extra_data%`.
+	 *                         Defaults to `%timestamp% %level% %entry% %extra_data%`.
+	 */
+	public function setEntryTemplate( $template ) {
+		$this->entryTemplate = $template;
+	}
+
+	/**
+	 * @param callable $callback Specifies the function to encode non-scalar data.
+	 *                           Defaults to `json_encode`.
+	 */
+	public function setDataEncoding( $callback ) {
+		$this->data_encoding = $callback;
+	}
+
+	/**
+	 * @param \OTGS_Log_Adapter $adapter
+	 */
+	public function addAdapter( OTGS_Log_Adapter $adapter ) {
+		$this->adapters[ get_class( $adapter ) ] = $adapter;
+	}
+
+	public function setTimestamp( OTGS_Log_TimeStamp $timestamp ) {
+		$this->timestamp = $timestamp;
+	}
+
+	/**
 	 * @return false|string
 	 */
 	protected function getTimestampValue() {
-		return $this->getTimeStamp()->get();;
+		return $this->getTimeStamp()->get();
 	}
 
 	protected function getDataEncoding() {

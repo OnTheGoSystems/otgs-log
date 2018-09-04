@@ -267,7 +267,7 @@ class Test_OTGS_Log extends TestCase {
 		$subject->addAdapter( $some_log_adapter );
 		$subject->addAdapter( $another_log_adapter );
 
-		$subject->add( $new_entry );
+		$subject->addInfo( $new_entry );
 	}
 
 	/**
