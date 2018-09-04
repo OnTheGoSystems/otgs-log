@@ -5,7 +5,7 @@
 
 namespace OTGS\Tests;
 
-class Test_File_System_Log extends TestCase {
+class Test_JSON_File_Log extends TestCase {
 
 	/**
 	 * @test
@@ -20,15 +20,13 @@ class Test_File_System_Log extends TestCase {
 		$updated_entries = $entries;
 		array_push( $updated_entries, $new_entry );
 
-		$subject = new \OTGS_File_System_Log( $filename );
+		$subject = new \OTGS_JSON_File_Log( $filename );
 
 		$subject->add( $new_entry );
 
 		$contents = file_get_contents( $filename );
-		$contents = preg_replace( '/^[\r\n]+/', '', $contents );
-		$contents = preg_replace( '/[\r\n]+$/', '', $contents );
 
-		$file_entries = explode( PHP_EOL, $contents );
+		$file_entries = json_decode( $contents, true );
 
 		$this->assertSame( $file_entries, $subject->getEntries() );
 
@@ -45,13 +43,15 @@ class Test_File_System_Log extends TestCase {
 			'Second-entry',
 		);
 
-		$file_content = implode( PHP_EOL, $entries );
+		$file_content = json_encode( $entries );
 
 		file_put_contents( $filename, $file_content );
 
-		$subject = new \OTGS_File_System_Log( $filename );
+		$subject = new \OTGS_JSON_File_Log( $filename );
 
-		$this->assertSame( $entries, $subject->getEntries() );
+		$file_entries = $subject->getEntries();
+
+		$this->assertSame( $entries, $file_entries );
 
 		unlink( $filename );
 	}

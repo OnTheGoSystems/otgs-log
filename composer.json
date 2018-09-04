@@ -35,5 +35,8 @@
     "classmap": [
       "src"
     ]
+  },
+  "require": {
+    "ext-json": "*"
   }
 }

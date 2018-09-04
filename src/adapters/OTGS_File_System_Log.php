@@ -5,8 +5,8 @@
  */
 class OTGS_File_System_Log extends OTGS_Log_Adapter {
 
-	private $filename;
-	private $max_entries;
+	protected $filename;
+	protected $max_entries;
 
 	/**
 	 * OTGS_WP_Option_Log constructor.
@@ -36,22 +36,40 @@ class OTGS_File_System_Log extends OTGS_Log_Adapter {
 		$contents = implode( PHP_EOL, $entries );
 		$contents .= PHP_EOL;
 
-		return file_put_contents( $this->filename, $contents );
+		return $this->saveContents( $contents );
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getEntries() {
-		$contents = '';
-		if ( file_exists( $this->filename ) ) {
-			$contents = file_get_contents( $this->filename );
-		}
+		$contents = $this->getContents();
 
 		$contents = preg_replace( '/^[\r\n]+/', '', $contents );
 		$contents = preg_replace( '/[\r\n]+$/', '', $contents );
 
 		return $contents ? explode( PHP_EOL, $contents ) : array();
+	}
+
+	/**
+	 * @return bool|string
+	 */
+	protected function getContents() {
+		$contents = '';
+		if ( file_exists( $this->filename ) ) {
+			$contents = file_get_contents( $this->filename );
+		}
+
+		return $contents;
+	}
+
+	/**
+	 * @param $contents
+	 *
+	 * @return bool|int
+	 */
+	protected function saveContents( $contents ) {
+		return file_put_contents( $this->filename, $contents );
 	}
 
 }
