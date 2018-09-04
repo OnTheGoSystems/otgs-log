@@ -25,7 +25,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 	 * @param string                      $entry_template
 	 * @param \OTGS_Log_Entry_Levels|null $entry_types
 	 */
-	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $entry_template = '%timestamp% %level% %entry% %extra_data%', OTGS_Log_Entry_Levels $entry_types = null ) {
+	public function __construct( array $adapters = array(), \OTGS_Log_TimeStamp $timestamp = null, $entry_template = '%timestamp% %level% %entry% %extra%', OTGS_Log_Entry_Levels $entry_types = null ) {
 		if ( ! $entry_types ) {
 			$entry_types = new OTGS_Log_Entry_Levels_Default();
 		}
@@ -64,24 +64,28 @@ class OTGS_Multi_Log implements OTGS_Log {
 		}
 		$level_name = $this->entry_types->getName( $level );
 
-		$extra_data['description'] = $this->entry_types->getDescription( $level );
+		$data = array();
+		if ( $extra_data ) {
+			$data['data'] = $extra_data;
+		}
+		$data['description'] = $this->entry_types->getDescription( $level );
 
 		$timestamp = $this->getTimestampValue();
 
 		if ( $this->current_adapter->hasTemplate() ) {
 
 			$encoded_extra_data = '';
-			if ( null !== $extra_data ) {
-				$encoded_extra_data = $extra_data;
-				if ( ! is_scalar( $extra_data ) ) {
-					$encoded_extra_data = call_user_func( $this->getDataEncoding(), $extra_data );
+			if ( null !== $data ) {
+				$encoded_extra_data = $data;
+				if ( ! is_scalar( $data ) ) {
+					$encoded_extra_data = call_user_func( $this->getDataEncoding(), $data );
 				}
 			}
 
-			$formatted_entry = str_replace( array( '%timestamp%', '%level%', '%entry%', '%extra_data%' ), array( $timestamp, $level, $entry, $encoded_extra_data ), $this->entryTemplate );
+			$formatted_entry = str_replace( array( '%timestamp%', '%level%', '%entry%', '%extra%' ), array( $timestamp, $level, $entry, $encoded_extra_data ), $this->entryTemplate );
 			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 
-			if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra_data%' ) === false ) {
+			if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra%' ) === false ) {
 				$formatted_entry = str_replace( array( '%timestamp%', '%entry%' ), array( $timestamp, $encoded_extra_data ), $this->entryTemplate );
 				$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 			}
@@ -92,7 +96,7 @@ class OTGS_Multi_Log implements OTGS_Log {
 				'level'      => $level,
 				'level_name' => $level_name,
 				'message'    => $entry,
-				'extra'      => $extra_data,
+				'extra'      => $data,
 				'datetime'   => array(
 					'date'     => $timestamp,
 					'timezone' => $this->getTimeStamp()->getTimeZoneValue(),
@@ -172,8 +176,8 @@ class OTGS_Multi_Log implements OTGS_Log {
 
 	/**
 	 * @param string $template Specifies the format which must be used to build the entry.
-	 *                         Placeholders: `%timestamp%`, `%level%`, `%entry%`, `%extra_data%`.
-	 *                         Defaults to `%timestamp% %level% %entry% %extra_data%`.
+	 *                         Placeholders: `%timestamp%`, `%level%`, `%entry%`, `%extra%`.
+	 *                         Defaults to `%timestamp% %level% %entry% %extra%`.
 	 */
 	public function setEntryTemplate( $template ) {
 		$this->entryTemplate = $template;

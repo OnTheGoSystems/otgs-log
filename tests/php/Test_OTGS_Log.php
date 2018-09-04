@@ -47,16 +47,22 @@ class Test_OTGS_Log extends TestCase {
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
-		$level              = 0;
-		$new_entry          = 'Last entry';
-		$extra_data         = array(
-			'A'           => 1,
-			'B'           => 2,
-			'C'           => 3,
-			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
+		$level               = 0;
+		$new_entry           = 'Last entry';
+		$extra_data          = array(
+			'A' => 1,
+			'B' => 2,
+			'C' => 3,
+		);
+		$expected_extra_data = array(
+			'data'        => array(
+				'A' => 1,
+				'B' => 2,
+				'C' => 3,
+			),
 			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
 		);
-		$encoded_extra_data = json_encode( $extra_data );
+		$encoded_extra_data  = json_encode( $expected_extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
@@ -87,12 +93,10 @@ class Test_OTGS_Log extends TestCase {
 
 		$level      = 0;
 		$new_entry  = 'Last entry';
-		$extra_data = array(
-			'A'           => 1,
-			'B'           => 2,
-			'C'           => 3,
-			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
-			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
+		$extra_data          = array(
+			'A' => 1,
+			'B' => 2,
+			'C' => 3,
 		);
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
@@ -124,14 +128,20 @@ class Test_OTGS_Log extends TestCase {
 
 		$level              = 0;
 		$new_entry          = 'Last entry';
-		$extra_data         = array(
-			'A'           => 1,
-			'B'           => 2,
-			'C'           => 3,
-			'type'        => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
+		$extra_data          = array(
+			'A' => 1,
+			'B' => 2,
+			'C' => 3,
+		);
+		$expected_extra_data = array(
+			'data'        => array(
+				'A' => 1,
+				'B' => 2,
+				'C' => 3,
+			),
 			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
 		);
-		$encoded_extra_data = serialize( $extra_data );
+		$encoded_extra_data = serialize( $expected_extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, true );
 		$some_log_adapter->expects( $this->once() )
@@ -163,10 +173,17 @@ class Test_OTGS_Log extends TestCase {
 
 		$level      = 0;
 		$new_entry  = 'Last entry';
-		$extra_data = array(
-			'A'           => 1,
-			'B'           => 2,
-			'C'           => 3,
+		$extra_data          = array(
+			'A' => 1,
+			'B' => 2,
+			'C' => 3,
+		);
+		$expected_extra_data = array(
+			'data'        => array(
+				'A' => 1,
+				'B' => 2,
+				'C' => 3,
+			),
 			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
 		);
 
@@ -178,7 +195,7 @@ class Test_OTGS_Log extends TestCase {
 							 'level'      => 0,
 							 'level_name' => \OTGS_Log_Entry_Levels::TYPE_EMERGENCY,
 							 'message'    => $new_entry,
-							 'extra'      => $extra_data,
+							 'extra'      => $expected_extra_data,
 							 'datetime'   => array(
 								 'date'     => $timestamp,
 								 'timezone' => 'Time/Zone',
@@ -207,7 +224,7 @@ class Test_OTGS_Log extends TestCase {
 	 * @throws \OTGS_MissingAdaptersException
 	 */
 	public function it_sets_the_format_of_the_entry_log() {
-		$entry_format = '%timestamp%: %level% %entry% %extra_data%';
+		$entry_format = '%timestamp%: %level% %entry% %extra%';
 		$timestamp    = 'yyy-mm-dd hh:mm:ss.mmmmm';
 		$adapter_name = 'SomeLogAdapter';
 
@@ -216,13 +233,13 @@ class Test_OTGS_Log extends TestCase {
 		$extra_data = array( 'Extra data' );
 
 		$expected_extra_data         = array(
-			'Extra data',
+			'data'        => $extra_data,
 			'description' => \OTGS_Log_Entry_Levels::DESCRIPTION_EMERGENCY,
 		);
 		$expected_extra_data_encoded = json_encode( $expected_extra_data );
 
 		$expected_entry = str_replace(
-			array( '%timestamp%', '%level%', '%entry%', '%extra_data%' ),
+			array( '%timestamp%', '%level%', '%entry%', '%extra%' ),
 			array( $timestamp, $level, $new_entry, $expected_extra_data_encoded ),
 			$entry_format
 		);

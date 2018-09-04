@@ -16,7 +16,7 @@ class Test_File_System_Log extends TestCase {
 	 * @test
 	 * @throws \OTGS_ExpectedFormattedEntryException
 	 */
-	public function it_throws_an_exception_when_trying_to_add_a_formatted_entry() {
+	public function it_throws_an_exception_when_trying_to_add_an_array_entry() {
 		$subject = new \OTGS_File_System_Log( self::getTestFile() );
 
 		$this->expectException( '\OTGS_ExpectedFormattedEntryException' );
