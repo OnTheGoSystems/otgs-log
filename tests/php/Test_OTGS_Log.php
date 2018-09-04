@@ -271,4 +271,8 @@ class Test_OTGS_Log extends TestCase {
 
 		return $timestamp;
 	}
+
+	protected function getLogFileName() {
+		// TODO: Implement getLogFileName() method.
+	}
 }

@@ -106,4 +106,8 @@ class Test_WP_Options_Log extends TestCase {
 		$this->assertCount( $limit, $file_entries );
 		$this->assertSame( $last_entry, end( $file_entries ) );
 	}
+
+	protected function getLogFileName() {
+		// TODO: Implement getLogFileName() method.
+	}
 }

@@ -17,4 +17,8 @@ class Test_OTGS_Log_Timestamp_Date extends TestCase {
 
 		$this->assertSame( date( $format ), $subject->get() );
 	}
+
+	protected function getLogFileName() {
+		// TODO: Implement getLogFileName() method.
+	}
 }

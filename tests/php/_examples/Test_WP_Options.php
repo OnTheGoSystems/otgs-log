@@ -109,4 +109,7 @@ class Test_Add_Log_Entries_In_WP_Options extends TestCase {
 
 	}
 
+	protected function getLogFileName() {
+		// TODO: Implement getLogFileName() method.
+	}
 }
