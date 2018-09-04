@@ -146,7 +146,6 @@ class Test_OTGS_Log extends TestCase {
 		$entry_type         = 'Info';
 		$new_entry          = 'Last entry';
 		$extra_data         = array( 'A' => 1, 'B' => 2, 'C' => 3 );
-		$encoded_extra_data = json_encode( $extra_data );
 
 		$some_log_adapter = $this->get_adapter_stub( $adapter_name, false );
 		$some_log_adapter->expects( $this->once() )
@@ -155,7 +154,7 @@ class Test_OTGS_Log extends TestCase {
 							 'timestamp'  => $timestamp,
 							 'type'       => $entry_type,
 							 'message'    => $new_entry,
-							 'extra_data' => $encoded_extra_data,
+							 'extra_data' => $extra_data,
 						 ) );
 		$some_log_adapter->expects( $this->never() )
 						 ->method( 'addFormatted' );

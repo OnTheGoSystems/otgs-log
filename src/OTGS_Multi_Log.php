@@ -83,31 +83,32 @@ class OTGS_Multi_Log implements OTGS_Log {
 			$this->getAdapter();
 		}
 
-		$encoded_extra_data = '';
-		if ( null !== $extra_data ) {
-			$encoded_extra_data = $extra_data;
-			if ( ! is_scalar( $extra_data ) ) {
-				$encoded_extra_data = call_user_func( $this->getDataEncoding(), $extra_data );
-			}
-		}
-
 		$timestamp = $this->getTimestamp();
 
 		if ( $this->current_adapter->hasTemplate() ) {
+
+			$encoded_extra_data = '';
+			if ( null !== $extra_data ) {
+				$encoded_extra_data = $extra_data;
+				if ( ! is_scalar( $extra_data ) ) {
+					$encoded_extra_data = call_user_func( $this->getDataEncoding(), $extra_data );
+				}
+			}
+
 			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%', '%extra_data%' ), array( $timestamp, $type, $entry, $encoded_extra_data ), $this->entryTemplate );
 			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
+
+			if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra_data%' ) === false ) {
+				$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->entryTemplate );
+				$this->current_adapter->addFormatted( trim( $formatted_entry ) );
+			}
 		} else {
 			$this->current_adapter->add( array(
 				'timestamp'  => $timestamp,
 				'type'       => $type,
 				'message'    => $entry,
-				'extra_data' => $encoded_extra_data,
+				'extra_data' => $extra_data,
 			) );
-		}
-
-		if ( $encoded_extra_data && strpos( $this->entryTemplate, '%extra_data%' ) === false ) {
-			$formatted_entry = str_replace( array( '%timestamp%', '%type%', '%entry%' ), array( $timestamp, $type, $encoded_extra_data ), $this->entryTemplate );
-			$this->current_adapter->addFormatted( trim( $formatted_entry ) );
 		}
 	}
 
