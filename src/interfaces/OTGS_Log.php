@@ -8,13 +8,13 @@
  */
 interface OTGS_Log {
 	/**
-	 * @param string     $entry
-	 * @param int        $level
-	 * @param array|null $extra_data
+	 * @param string $entry
+	 * @param int    $level
+	 * @param array  $extra_data
 	 *
 	 * @return
 	 */
-	public function add( $entry, $level, array $extra_data = null );
+	public function add( $entry, $level, array $extra_data = array() );
 
 	/**
 	 * Get all entries
